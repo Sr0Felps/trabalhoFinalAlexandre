@@ -1,6 +1,5 @@
 package TrabalhoFinal.com.adega.manager.service;
 
-
 import TrabalhoFinal.com.adega.manager.model.Categoria;
 import TrabalhoFinal.com.adega.manager.model.Vinho;
 import TrabalhoFinal.com.adega.manager.repository.CategoriaRepository;
@@ -20,17 +19,14 @@ public class VinhoService {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
-    // Retorna todos os vinhos registados na base de dados
     public List<Vinho> listarTodos() {
         return vinhoRepository.findAll();
     }
 
-    // Procura um vinho específico pelo ID
     public Optional<Vinho> buscarPorId(Long id) {
         return vinhoRepository.findById(id);
     }
 
-    // Guarda um novo vinho, validando a categoria
     public Vinho salvar(Vinho vinho) {
         if (vinho.getCategoria() != null && vinho.getCategoria().getId() != null) {
             Optional<Categoria> categoria = categoriaRepository.findById(vinho.getCategoria().getId());
@@ -42,7 +38,25 @@ public class VinhoService {
         throw new IllegalArgumentException("Categoria inválida ou não encontrada.");
     }
 
-    // Apaga um vinho pelo ID
+    public Vinho atualizar(Long id, Vinho vinhoAtualizado) {
+        return vinhoRepository.findById(id).map(vinho -> {
+            vinho.setNome(vinhoAtualizado.getNome());
+            vinho.setVinicola(vinhoAtualizado.getVinicola());
+            vinho.setSafra(vinhoAtualizado.getSafra());
+            vinho.setQuantidadeEstoque(vinhoAtualizado.getQuantidadeEstoque());
+
+            if (vinhoAtualizado.getCategoria() != null && vinhoAtualizado.getCategoria().getId() != null) {
+                Optional<Categoria> categoria = categoriaRepository.findById(vinhoAtualizado.getCategoria().getId());
+                if (categoria.isPresent()) {
+                    vinho.setCategoria(categoria.get());
+                } else {
+                    throw new IllegalArgumentException("Categoria inválida ou não encontrada.");
+                }
+            }
+            return vinhoRepository.save(vinho);
+        }).orElseThrow(() -> new IllegalArgumentException("Vinho não encontrado."));
+    }
+
     public void deletar(Long id) {
         vinhoRepository.deleteById(id);
     }

@@ -41,6 +41,16 @@ public class VinhoController {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Vinho> atualizarVinho(@PathVariable Long id, @RequestBody Vinho vinho) {
+        try {
+            Vinho vinhoAtualizado = vinhoService.atualizar(id, vinho);
+            return ResponseEntity.ok(vinhoAtualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removerVinho(@PathVariable Long id) {
         vinhoService.deletar(id);
